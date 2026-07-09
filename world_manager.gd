@@ -21,22 +21,34 @@ var obstacle_timer: Timer
 # ============================================================
 func _ready() -> void:
 	_setup_environment()
-	_create_ground_segments()
+	var floor_material: StandardMaterial3D = _make_floor_material()
+	_create_ground_segments(floor_material)
 	_create_obstacle_timer()
+
+
+# ============================================================
+# Создание материала пола с текстурой
+# ============================================================
+func _make_floor_material() -> StandardMaterial3D:
+	var material: StandardMaterial3D = StandardMaterial3D.new()
+	var texture: Texture2D = load("res://floor_texture.jpg")
+	material.albedo_texture = texture
+	material.uv1_scale = Vector3(10, 10, 10)
+	return material
 
 
 # ============================================================
 # Спавн 6 сегментов пола
 # ============================================================
-func _create_ground_segments() -> void:
+func _create_ground_segments(floor_material: StandardMaterial3D) -> void:
 	for i in range(SEGMENT_COUNT):
-		var segment: Node3D = _make_ground_segment()
+		var segment: Node3D = _make_ground_segment(floor_material)
 		segment.position.z = 40.0 - i * SEGMENT_LENGTH
 		add_child(segment)
 		ground_segments.append(segment)
 
 
-func _make_ground_segment() -> Node3D:
+func _make_ground_segment(floor_material: StandardMaterial3D) -> Node3D:
 	var seg: Node3D = Node3D.new()
 	seg.name = "GroundSegment"
 
@@ -45,6 +57,7 @@ func _make_ground_segment() -> Node3D:
 	var box: BoxMesh = BoxMesh.new()
 	box.size = Vector3(10.0, 1.0, SEGMENT_LENGTH + 0.5)
 	mesh_instance.mesh = box
+	mesh_instance.material_override = floor_material
 	seg.add_child(mesh_instance)
 
 	var collision_shape: CollisionShape3D = CollisionShape3D.new()
