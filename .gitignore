@@ -1,0 +1,24 @@
+# Godot-specific ignores
+.godot/
+.godot/shader_cache/
+
+# Imported assets (can be regenerated)
+.godot/imported/
+
+# Editor settings (local user preferences)
+.godot/editor/
+
+# Export presets
+*.tpz
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

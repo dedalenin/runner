@@ -1,0 +1,55 @@
+[gd_scene load_steps=6 format=3 uid="uid://dvkbjrj4g3v86"]
+
+[ext_resource type="Script" path="res://player.gd" id="1_player"]
+[ext_resource type="Script" path="res://ground.gd" id="2_ground"]
+[ext_resource type="Script" path="res://world_manager.gd" id="3_world_manager"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(1, 1, 1)
+
+[node name="Node3D" type="Node3D" unique_id=1557944421]
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=202339610]
+script = ExtResource("1_player")
+
+[node name="Ground1" type="AnimatableBody3D" parent="." unique_id=743753578]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+script = ExtResource("2_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground1" unique_id=1348394040]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground1" unique_id=774839334]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Ground2" type="AnimatableBody3D" parent="." unique_id=1032452462]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 100)
+script = ExtResource("2_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground2" unique_id=1743859269]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground2" unique_id=1320119364]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Ground3" type="AnimatableBody3D" parent="." unique_id=1212794312]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 200)
+script = ExtResource("2_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground3" unique_id=1242530052]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground3" unique_id=684832027]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="WorldManager" type="Node3D" parent="." unique_id=1670743983]
+script = ExtResource("3_world_manager")
