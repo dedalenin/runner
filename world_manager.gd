@@ -4,6 +4,11 @@ extends Node3D
 # WorldManager — спавнит пол и препятствия, управляет миром
 # ============================================================
 
+# Переключатели типов препятствий (чекбоксы в Inspector)
+@export var enable_jump: bool = true   # Нижнее — нужно перепрыгнуть
+@export var enable_duck: bool = true   # Верхнее — нужно пригнуться
+@export var enable_wall: bool = true   # Стена — нужно уклоняться
+
 const SPEED: float = 15.0
 const SEGMENT_LENGTH: float = 40.0
 const SEGMENT_COUNT: int = 6
@@ -108,21 +113,30 @@ func _spawn_obstacle() -> void:
 
 	var chosen_pattern: Array = weighted_patterns[randi() % weighted_patterns.size()]
 
+	# Формируем список доступных типов препятствий по чекбоксам
+	var available_types: Array = []
+	if enable_jump:
+		available_types.append(0)
+	if enable_duck:
+		available_types.append(1)
+	if enable_wall:
+		available_types.append(2)
+
+	# Если все чекбоксы выключены — ничего не спавним
+	if available_types.size() == 0:
+		return
+
 	# Генерируем типы для каждой линии паттерна
 	var types: Array = []
 	for i in range(chosen_pattern.size()):
-		types.append(randi() % 3)
+		types.append(available_types[randi() % available_types.size()])
 
-	# Защита от непроходимости: если все 3 — Стены, заменяем одну
-	if chosen_pattern.size() == 3:
-		var all_walls: bool = true
-		for t in types:
-			if t != 2:
-				all_walls = false
-				break
-		if all_walls:
-			# Меняем случайную стену на Нижнее (0) или Верхнее (1)
-			types[randi() % 3] = randi() % 2
+	# Защита от непроходимости: если все 3 — Стены и доступна только Стена,
+	# удаляем одно препятствие из ряда (не спавним его)
+	if chosen_pattern.size() == 3 and available_types.size() == 1 and available_types[0] == 2:
+		# Убираем случайное препятствие — останется проход
+		chosen_pattern.remove_at(randi() % chosen_pattern.size())
+		types.resize(chosen_pattern.size())
 
 	# Спавним препятствия по паттерну
 	for i in range(chosen_pattern.size()):
