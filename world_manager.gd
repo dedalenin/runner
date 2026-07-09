@@ -20,6 +20,7 @@ var obstacle_timer: Timer
 # _ready
 # ============================================================
 func _ready() -> void:
+	_setup_environment()
 	_create_ground_segments()
 	_create_obstacle_timer()
 
@@ -79,19 +80,47 @@ func _on_obstacle_timer_timeout() -> void:
 # Спавн препятствия
 # ============================================================
 func _spawn_obstacle() -> void:
-	var obstacle: Node3D = _make_obstacle()
-	add_child(obstacle)
+	# Взвешенные паттерны: [0] (центр) с высоким шансом
+	var weighted_patterns: Array = [
+		[0.0],          # центр — 3× вес
+		[0.0],
+		[0.0],
+		[-2.0],         # лево
+		[2.0],          # право
+		[-2.0, 0.0],    # лево + центр
+		[0.0, 2.0],     # центр + право
+		[-2.0, 2.0],    # лево + право
+		[-2.0, 0.0, 2.0],  # все полосы
+	]
+
+	var chosen_pattern: Array = weighted_patterns[randi() % weighted_patterns.size()]
+
+	# Генерируем типы для каждой линии паттерна
+	var types: Array = []
+	for i in range(chosen_pattern.size()):
+		types.append(randi() % 3)
+
+	# Защита от непроходимости: если все 3 — Стены, заменяем одну
+	if chosen_pattern.size() == 3:
+		var all_walls: bool = true
+		for t in types:
+			if t != 2:
+				all_walls = false
+				break
+		if all_walls:
+			# Меняем случайную стену на Нижнее (0) или Верхнее (1)
+			types[randi() % 3] = randi() % 2
+
+	# Спавним препятствия по паттерну
+	for i in range(chosen_pattern.size()):
+		var obstacle: Node3D = _make_obstacle_for_lane(chosen_pattern[i], types[i])
+		add_child(obstacle)
 
 
-func _make_obstacle() -> Node3D:
+func _make_obstacle_for_lane(lane_x: float, type_idx: int) -> Node3D:
 	var obs: Node3D = Node3D.new()
 	obs.name = "Obstacle"
 
-	# Случайная полоса
-	var lane_x: float = LANES[randi() % LANES.size()]
-
-	# Случайный тип: 0 = нижнее (Jump), 1 = верхнее (Duck), 2 = стена (Dodge)
-	var type_idx: int = randi() % 3
 	var size_y: float
 	var y_pos: float
 
@@ -145,3 +174,20 @@ func _process(delta: float) -> void:
 		seg.position.z += SPEED * delta
 		if seg.position.z > RECYCLE_Z:
 			seg.position.z += RECYCLE_OFFSET
+
+
+# ============================================================
+# Хоррор-окружение — WorldEnvironment (черный фон + туман)
+# ============================================================
+func _setup_environment() -> void:
+	var env: Environment = Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0, 0, 0)
+
+	env.volumetric_fog_enabled = true
+	env.volumetric_fog_density = 0.08
+	env.volumetric_fog_albedo = Color(0.1, 0.1, 0.1)
+
+	var world_env: WorldEnvironment = WorldEnvironment.new()
+	world_env.environment = env
+	add_child(world_env)

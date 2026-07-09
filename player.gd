@@ -43,6 +43,7 @@ func _ready() -> void:
 	camera.current = true
 	camera.position = Vector3(LANE_X[current_lane], BASE_CAMERA_Y, 0.0)
 	add_child(camera)
+	_setup_flashlight()
 
 
 # ============================================================
@@ -154,3 +155,16 @@ func _camera_shake() -> void:
 
 	# Возврат в исходную позицию
 	shake_tween.tween_property(camera, "position", original_pos, step_duration * 0.5)
+
+
+# ============================================================
+# Фонарик — SpotLight3D, прикреплённый к камере
+# ============================================================
+func _setup_flashlight() -> void:
+	var flashlight: SpotLight3D = SpotLight3D.new()
+	flashlight.name = "Flashlight"
+	flashlight.spot_range = 30.0
+	flashlight.spot_angle = 35.0
+	flashlight.light_energy = 3.0
+	flashlight.shadow_enabled = true
+	camera.add_child(flashlight)
